@@ -1,0 +1,11 @@
+[development]
+network = "testnet"
+rpc_url = "https://soroban-testnet.stellar.org"
+network_passphrase = "Test SDF Network ; September 2015"
+horizon_url = "https://horizon-testnet.stellar.org"
+
+[production]
+network = "mainnet"
+rpc_url = "https://soroban-rpc.stellar.org"
+network_passphrase = "Public Global Stellar Network ; September 2015"
+horizon_url = "https://horizon.stellar.org"
