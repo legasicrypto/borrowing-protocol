@@ -1,22 +1,31 @@
-import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Plus } from "lucide-react";
-import solLogo from "@/assets/sol-logo.png";
-import usdcLogo from "@/assets/usdc-logo.png";
+"use client"
+
+import { useState } from "react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Plus } from "lucide-react"
+import btcLogo from "@/assets/btc-logo.webp"
+import usdcLogo from "@/assets/usdc-logo.png"
 
 interface AddCollateralModalProps {
-  open: boolean;
-  onClose: () => void;
-  onConfirm: (amount: number) => void;
-  collateralType: string;
-  currentCollateral: number;
-  currentLtv: number;
-  borrowedAmount: number;
-  cryptoPrice: number;
-  availableBalance: number;
+  open: boolean
+  onClose: () => void
+  onConfirm: (amount: number) => void
+  collateralType: string
+  currentCollateral: number
+  currentLtv: number
+  borrowedAmount: number
+  cryptoPrice: number
+  availableBalance: number
 }
 
 export function AddCollateralModal({
@@ -30,30 +39,30 @@ export function AddCollateralModal({
   cryptoPrice,
   availableBalance,
 }: AddCollateralModalProps) {
-  const [amount, setAmount] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [amount, setAmount] = useState("")
+  const [loading, setLoading] = useState(false)
 
   const handleConfirm = async () => {
-    const collateralAmount = parseFloat(amount);
+    const collateralAmount = Number.parseFloat(amount)
     if (isNaN(collateralAmount) || collateralAmount <= 0) {
-      return;
+      return
     }
 
-    setLoading(true);
-    await onConfirm(collateralAmount);
-    setLoading(false);
-    setAmount("");
-    onClose();
-  };
+    setLoading(true)
+    await onConfirm(collateralAmount)
+    setLoading(false)
+    setAmount("")
+    onClose()
+  }
 
-  const additionalAmount = parseFloat(amount || "0");
-  const newCollateral = currentCollateral + additionalAmount;
-  const newCollateralValue = newCollateral * cryptoPrice;
-  const newLtv = (borrowedAmount / newCollateralValue) * 100;
+  const additionalAmount = Number.parseFloat(amount || "0")
+  const newCollateral = currentCollateral + additionalAmount
+  const newCollateralValue = newCollateral * cryptoPrice
+  const newLtv = (borrowedAmount / newCollateralValue) * 100
 
   const getCollateralLogo = () => {
-    return collateralType === "SOL" ? solLogo : usdcLogo;
-  };
+    return collateralType === "BTC" ? btcLogo : usdcLogo
+  }
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -64,8 +73,8 @@ export function AddCollateralModal({
             Add Collateral
           </DialogTitle>
           <DialogDescription className="flex items-center gap-1.5">
-            Enter the amount of 
-            <img src={getCollateralLogo()} alt={collateralType} className="w-4 h-4 inline" />
+            Enter the amount of
+            <img src={getCollateralLogo() || "/placeholder.svg"} alt={collateralType} className="w-4 h-4 inline" />
             {collateralType} you want to add
           </DialogDescription>
         </DialogHeader>
@@ -93,18 +102,18 @@ export function AddCollateralModal({
               </Button>
             </div>
             <p className="text-xs text-muted-foreground flex items-center gap-1">
-              Current collateral: 
-              <img src={getCollateralLogo()} alt={collateralType} className="w-3 h-3 inline" />
+              Current collateral:
+              <img src={getCollateralLogo() || "/placeholder.svg"} alt={collateralType} className="w-3 h-3 inline" />
               {currentCollateral.toFixed(4)} {collateralType}
             </p>
             <p className="text-xs text-legasi-green font-semibold flex items-center gap-1">
-              Available: 
-              <img src={getCollateralLogo()} alt={collateralType} className="w-3 h-3 inline" />
+              Available:
+              <img src={getCollateralLogo() || "/placeholder.svg"} alt={collateralType} className="w-3 h-3 inline" />
               {availableBalance.toFixed(4)} {collateralType}
             </p>
           </div>
 
-          {amount && parseFloat(amount) > 0 && (
+          {amount && Number.parseFloat(amount) > 0 && (
             <>
               {/* Collateral Increase Progress Gauge */}
               <div className="space-y-1">
@@ -123,22 +132,22 @@ export function AddCollateralModal({
               </div>
 
               <div className="p-4 bg-background rounded-lg space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Current LTV</span>
-                <span className="font-semibold">{currentLtv.toFixed(2)}%</span>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Current LTV</span>
+                  <span className="font-semibold">{currentLtv.toFixed(2)}%</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">New Collateral</span>
+                  <span className="font-semibold flex items-center gap-1">
+                    <img src={getCollateralLogo() || "/placeholder.svg"} alt={collateralType} className="w-3 h-3" />
+                    {newCollateral.toFixed(4)} {collateralType}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">New LTV</span>
+                  <span className="font-semibold text-legasi-green">{newLtv.toFixed(2)}%</span>
+                </div>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">New Collateral</span>
-                <span className="font-semibold flex items-center gap-1">
-                  <img src={getCollateralLogo()} alt={collateralType} className="w-3 h-3" />
-                  {newCollateral.toFixed(4)} {collateralType}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">New LTV</span>
-                <span className="font-semibold text-legasi-green">{newLtv.toFixed(2)}%</span>
-              </div>
-            </div>
             </>
           )}
         </div>
@@ -147,14 +156,11 @@ export function AddCollateralModal({
           <Button variant="outline" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
-          <Button
-            onClick={handleConfirm}
-            disabled={loading || !amount || parseFloat(amount) <= 0}
-          >
+          <Button onClick={handleConfirm} disabled={loading || !amount || Number.parseFloat(amount) <= 0}>
             {loading ? "Processing..." : "Add Collateral"}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

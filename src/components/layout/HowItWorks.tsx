@@ -1,5 +1,7 @@
-import { motion } from "framer-motion";
-import { Wallet, FileCheck, Coins } from "lucide-react";
+"use client"
+
+import { motion } from "framer-motion"
+import { Wallet, FileCheck, Coins } from "lucide-react"
 
 const STEPS = [
   {
@@ -10,8 +12,8 @@ const STEPS = [
   },
   {
     icon: FileCheck,
-    title: "Complete KYC Verification",
-    description: "Quick 5-step verification process with instant approval",
+    title: "Verify Your Identity (Optional)",
+    description: "Complete our quick KYC process to unlock higher limits and fiat features",
     color: "legasi-purple",
   },
   {
@@ -20,7 +22,7 @@ const STEPS = [
     description: "Choose your collateral and get stablecoins or fiat instantly",
     color: "legasi-green",
   },
-];
+]
 
 export function HowItWorks() {
   return (
@@ -60,9 +62,7 @@ export function HowItWorks() {
                   <step.icon className={`w-8 h-8 text-${step.color}`} />
                 </div>
                 <h3 className="text-2xl font-bold mb-3">{step.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {step.description}
-                </p>
+                <p className="text-muted-foreground leading-relaxed">{step.description}</p>
               </div>
 
               {/* Connector Line (hidden on last item) */}
@@ -74,5 +74,5 @@ export function HowItWorks() {
         </div>
       </div>
     </section>
-  );
+  )
 }

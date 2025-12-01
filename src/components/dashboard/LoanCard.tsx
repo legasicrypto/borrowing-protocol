@@ -1,24 +1,26 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ProgressBarLtv } from "@/components/ui/ProgressBarLtv";
-import { RiskBadge } from "@/components/ui/RiskBadge";
-import { Button } from "@/components/ui/button";
-import { DollarSign, TrendingDown, TrendingUp } from "lucide-react";
-import solLogo from "@/assets/sol-logo.png";
-import usdcLogo from "@/assets/usdc-logo.png";
-import eurcLogo from "@/assets/eurc-logo.png";
+"use client"
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { ProgressBarLtv } from "@/components/ui/ProgressBarLtv"
+import { RiskBadge } from "@/components/ui/RiskBadge"
+import { Button } from "@/components/ui/button"
+import { DollarSign, TrendingDown, TrendingUp } from "lucide-react"
+import btcLogo from "@/assets/btc-logo.webp"
+import usdcLogo from "@/assets/usdc-logo.png"
+import eurcLogo from "@/assets/eurc-logo.png"
 
 interface LoanCardProps {
-  collateralType: string;
-  collateralAmount: number;
-  borrowedEur: number;
-  borrowCurrency: "USDC" | "EURC";
-  ltvRatio: number;
-  healthFactor: number;
-  interestRate: number;
-  autoTopUpEnabled?: boolean;
-  onRepay: () => void;
-  onAddCollateral: () => void;
-  onCloseLoan?: () => void;
+  collateralType: string
+  collateralAmount: number
+  borrowedEur: number
+  borrowCurrency: "USDC" | "EURC"
+  ltvRatio: number
+  healthFactor: number
+  interestRate: number
+  autoTopUpEnabled?: boolean
+  onRepay: () => void
+  onAddCollateral: () => void
+  onCloseLoan?: () => void
 }
 
 export function LoanCard({
@@ -35,21 +37,21 @@ export function LoanCard({
   onCloseLoan,
 }: LoanCardProps) {
   const getHealthStatus = () => {
-    if (healthFactor >= 1.5) return "healthy";
-    if (healthFactor >= 1.2) return "warning";
-    return "critical";
-  };
+    if (healthFactor >= 1.5) return "healthy"
+    if (healthFactor >= 1.2) return "warning"
+    return "critical"
+  }
 
   const getLogo = () => {
-    return collateralType === "SOL" ? solLogo : usdcLogo;
-  };
+    return collateralType === "BTC" ? btcLogo : usdcLogo
+  }
 
   return (
     <Card className="bg-legasi-card border-border">
       <CardHeader>
         <div className="flex justify-between items-start">
           <CardTitle className="flex items-center gap-2">
-            <img src={getLogo()} alt={collateralType} className="h-5 w-5" />
+            <img src={getLogo() || "/placeholder.svg"} alt={collateralType} className="h-5 w-5" />
             {collateralType} Loan
           </CardTitle>
           <div className="flex items-center gap-2">
@@ -57,9 +59,7 @@ export function LoanCard({
             {autoTopUpEnabled && (
               <div className="flex items-center gap-1.5 bg-legasi-green/20 border border-legasi-green/40 rounded-full px-3 py-1">
                 <div className="h-1.5 w-1.5 bg-legasi-green rounded-full animate-pulse" />
-                <span className="text-xs font-medium text-legasi-green">
-                  Auto-Top-Up
-                </span>
+                <span className="text-xs font-medium text-legasi-green">Auto-Top-Up</span>
               </div>
             )}
           </div>
@@ -107,7 +107,7 @@ export function LoanCard({
             <DollarSign className="h-4 w-4 mr-2" />
             Repay
           </Button>
-          <Button onClick={onAddCollateral} variant="outline" className="flex-1">
+          <Button onClick={onAddCollateral} variant="outline" className="flex-1 bg-transparent">
             Add Collateral
           </Button>
           {onCloseLoan && (
@@ -118,5 +118,5 @@ export function LoanCard({
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
