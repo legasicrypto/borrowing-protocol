@@ -252,7 +252,7 @@ export default function Dashboard() {
     await refreshTransactions()
 
     // Credit the borrowed amount to user's bank account based on currency
-    const balanceColumn = newLoan.borrowCurrency === "EURC" ? "usd_balance" : "eurc_balance"
+    const balanceColumn = newLoan.borrowCurrency === "USDC" ? "usd_balance" : "eurc_balance"
     const { data: bankData, error: bankFetchError } = await supabase
       .from("user_bank_accounts")
       .select(balanceColumn)
@@ -469,7 +469,7 @@ export default function Dashboard() {
     const loan = loans.find((l) => l.id === selectedLoanId)
     if (!loan) return
 
-    const balanceField = loan.borrowCurrency === "EURC" ? "eurc_balance" : "usd_balance"
+    const balanceField = loan.borrowCurrency === "USDC" ? "usd_balance" : "eurc_balance"
 
     // Calculate prorated interest based on loan duration
     const interestAccrued = calculateAccruedInterest(loan.borrowedEur, loan.interestRate, loan.createdAt)
@@ -681,7 +681,13 @@ export default function Dashboard() {
         {/* My Loans - Show borrowed stablecoins */}
         {session?.user?.id && (
           <div className="mb-8">
-            <MyLoans userId={session.user.id} onTransactionsUpdate={refreshTransactions} />
+            <MyLoans
+              userId={session.user.id}
+              bankAccount={bankAccount}
+              loading={false}
+              refreshBankAccount={refreshBankAccount}
+              onTransactionsUpdate={refreshTransactions}
+            />
           </div>
         )}
 
