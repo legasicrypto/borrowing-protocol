@@ -251,31 +251,48 @@ export default function Dashboard() {
     // ✅ Refresh immédiat des transactions
     await refreshTransactions()
 
-    // Credit the borrowed amount to user's bank account based on currency
     const balanceColumn = newLoan.borrowCurrency === "USDC" ? "usd_balance" : "eurc_balance"
-    const { data: bankData, error: bankFetchError } = await supabase
+
+    // First, try to get existing bank account
+    const { data: existingBank } = await supabase
       .from("user_bank_accounts")
-      .select(balanceColumn)
+      .select("*")
       .eq("user_id", session.user.id)
-      .single()
+      .maybeSingle()
 
-    if (bankFetchError) {
-      console.error("Bank account fetch error:", bankFetchError)
-      toast.error("Loan created but failed to update balance")
-      return
-    }
+    if (!existingBank) {
+      // Create new bank account with the borrowed amount
+      const newBankAccount = {
+        user_id: session.user.id,
+        iban_legasi: `LEGASI-${session.user.id.substring(0, 8).toUpperCase()}`,
+        eur_balance: 0,
+        usd_balance: newLoan.borrowCurrency === "USDC" ? newLoan.borrowedEur : 0,
+        eurc_balance: newLoan.borrowCurrency === "EURC" ? newLoan.borrowedEur : 0,
+        usd_fiat_balance: 0,
+      }
 
-    const newBalance = Number(bankData[balanceColumn]) + newLoan.borrowedEur
+      const { error: insertError } = await supabase.from("user_bank_accounts").insert(newBankAccount)
 
-    const { error: bankUpdateError } = await supabase
-      .from("user_bank_accounts")
-      .update({ [balanceColumn]: newBalance })
-      .eq("user_id", session.user.id)
+      if (insertError) {
+        console.error("Bank account creation error:", insertError)
+        toast.error("Loan created but failed to create bank account")
+        return
+      }
+    } else {
+      // Update existing bank account
+      const currentBalance = Number(existingBank[balanceColumn] || 0)
+      const newBalance = currentBalance + newLoan.borrowedEur
 
-    if (bankUpdateError) {
-      console.error("Bank account update error:", bankUpdateError)
-      toast.error("Loan created but failed to credit account")
-      return
+      const { error: bankUpdateError } = await supabase
+        .from("user_bank_accounts")
+        .update({ [balanceColumn]: newBalance })
+        .eq("user_id", session.user.id)
+
+      if (bankUpdateError) {
+        console.error("Bank account update error:", bankUpdateError)
+        toast.error("Loan created but failed to credit account")
+        return
+      }
     }
 
     // ✅ Refresh immédiat du solde
@@ -455,7 +472,7 @@ export default function Dashboard() {
 
   const getCurrentBalance = (borrowCurrency: "USDC" | "EURC"): number => {
     if (!bankAccount) return 0
-    return borrowCurrency === "EURC" ? Number(bankAccount.eurc_balance) : Number(bankAccount.usdc_balance)
+    return borrowCurrency === "EURC" ? Number(bankAccount.eurc_balance) : Number(bankAccount.usd_balance)
   }
 
   const handleCloseLoan = (loanId: string) => {
